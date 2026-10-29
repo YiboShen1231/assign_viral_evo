@@ -24,8 +24,8 @@ def jukes_cantor(reference_sequence: str, distant_sequence: str) -> float:
     valid_sites = 0
     differences = 0
 
-    for a, b in zip(reference_sequence, distant_sequence):
-        if a == "-" or b == "-":
+    for a, b in zip(reference_sequence.upper(), distant_sequence.upper()):
+        if a not in "ACGT" or b not in "ACGT":
             continue
 
         valid_sites += 1
@@ -63,4 +63,27 @@ def kimura_two_parameter(reference_sequence: str, distant_sequence: str) -> floa
         For example 1.196.
 
     """
-    raise NotImplementedError()
+
+    import math
+    valid_sites = 0
+    transitions = 0
+    transversions = 0
+
+    for a, b in zip(reference_sequence.upper(), distant_sequence.upper()):
+        if a not in "ACGT" or b not in "ACGT":
+            continue
+        valid_sites += 1
+        if a != b:
+            if (a in "AG" and b in "AG") or (a in "CT" and b in "CT"):
+                transitions += 1
+            else:
+                transversions += 1
+
+    if valid_sites == 0:
+        return 0.0
+
+    p = transitions / valid_sites
+    q = transversions / valid_sites
+    distance = -0.5 * math.log(1 - 2 * p - q) - 0.25 * math.log(1 - 2 * q)
+
+    return distance * valid_sites
